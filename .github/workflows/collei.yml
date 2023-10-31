@@ -1,0 +1,38 @@
+name: "Check in and redeem codes"
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+  
+jobs:
+  check_in_and_redeem:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      - name: Set up python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      
+      - name: Execute Collei
+        env: 
+          GENSHIN_COOKIES: ${{ secrets.GENSHIN_COOKIES }}
+          STARRAIL_COOKIES: ${{ secrets.STARRAIL_COOKIES }}
+          SKIP_DAILY: ${{ vars.SKIP_DAILY }}
+          SKIP_CODES: ${{ vars.SKIP_CODES }}
+        run: python3 collei
+      
+      - name: Update git repository
+        run: |
+          git config user.name "Collei"
+          git config user.email "collei@forrest.rangers"
+          git add .
+          git commit -m "Update newly redeemed codes" || exit 0
+          git show
+          git push

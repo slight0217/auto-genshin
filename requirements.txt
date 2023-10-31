@@ -1,0 +1,3 @@
+genshin @ git+https://github.com/thesadru/genshin.py
+requests
+beautifulsoup4
